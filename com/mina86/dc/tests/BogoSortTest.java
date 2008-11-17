@@ -11,14 +11,21 @@ import com.mina86.util.SignalHandlers;
 import com.mina86.dc.client.TaskLoader;
 
 
+/** A simple test program for a BogoSort task. */
 final public class BogoSortTest
 	implements Task.ProgressListener, SignalHandlers.Listener {
 
+
+	/**
+	 * Runs the test.
+	 * \param args program arguments (ignored)
+	 */
 	public static void main(String [] args) {
 		(new BogoSortTest()).run();
 	}
 
 
+	/** Runs the test. */
 	private void run() {
 		System.out.print("Bogo Sort testing program\n");
 		BogoSort<String> bogoSortTask = null;
@@ -103,10 +110,23 @@ final public class BogoSortTest
 
 
 
+	/** Characters used in animation. */
 	private static char animation[] = { '.', 'o', 'O', '0', 'O', 'o' };
+	/** Index of character used in animation. */
 	private int animationPos = -1;
-	private long lastTick = 0, lastSave = 0;
+	/** Last time animation character was changed. */
+	private long lastTick = 0;
+	/** Last time task was saved. */
+	private lastSave = 0;
 
+	/**
+	 * Called each time task finishes single cycle.  This method saves
+	 * task on disk every five seconds and updates animation four
+	 * times per second.
+	 * \param task       task being calculated.
+	 * \param iterations how many iterations there wer (ignored).
+	 * \param end        how many iterations are needed (ignored).
+	 */
 	public void onProgress(Task task, long iterations, long end) {
 		long tick = (new Date()).getTime();
 		if (tick - lastSave >= 5000) {
@@ -123,7 +143,7 @@ final public class BogoSortTest
 	}
 
 
-
+	/** The task being performed. */
 	private Task task;
 
 	public void handleSignal() {

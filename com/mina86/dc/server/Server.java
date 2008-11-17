@@ -13,8 +13,8 @@ import com.mina86.util.GetOptions;
 import com.mina86.util.SignalHandlers;
 
 
-public final class Server
-	implements ServerInterface, DC.Application {
+/** A distributed computing server. */
+public final class Server implements ServerInterface, DC.Application {
 
 	static String data[] = {
 		"foo", "bar", "baz", "qux", "quux", "fred", "barney",
@@ -37,10 +37,22 @@ public final class Server
 	}
 
 
-	public static void catchException(Exception e) {
+	/**
+	 * A helper method which displays exception's name and exits
+	 * application.
+	 * \param e    exception that has been caught.
+	 */
+	private static void catchException(Exception e) {
 		catchException(e, true);
 	}
-	public static void catchException(Exception e, boolean exit) {
+
+	/**
+	 * A helper method which displays exception's name and exits
+	 * application if \a exit is \c true.
+	 * \param e    exception that has been caught.
+	 * \param exit whether to exit after printing exception ingo.
+	 */
+	private static void catchException(Exception e, boolean exit) {
 		System.out.print("failed.\n");
 		e.printStackTrace();
 		if (exit) {
@@ -49,8 +61,11 @@ public final class Server
 	}
 
 
+	/** The local registry to bind to. */
 	private Registry registry = null;
+	/** The name to bind to. */
 	private String serviceName = null;
+	/** Whether the service was bound. */
 	private boolean serviceBound = false;
 
 	public void run(String args[]) {
@@ -104,8 +119,14 @@ public final class Server
 	}
 
 
+	/** Whether there was a signal. */
 	private volatile boolean interrupted = false;
+	/** Checks whether there was a signal and exits with \c 0 exit code. */
 	private void checkInterrupt() { checkInterrupt(0); }
+	/**
+	 * Checks whether there was a signal and exits with given exit code.
+	 * \param exitCode exit code to exit with if program was interrupted
+	 */
 	private void checkInterrupt(int exitCode) {
 		if (interrupted) {
 			System.out.println("Interrupted, exiting.");
