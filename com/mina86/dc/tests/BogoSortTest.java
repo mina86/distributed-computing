@@ -8,6 +8,7 @@ import java.io.IOException;
 import com.mina86.dc.common.Task;
 import com.mina86.dc.tasks.BogoSort;
 import com.mina86.util.SignalHandlers;
+import com.mina86.dc.client.TaskLoader;
 
 
 final public class BogoSortTest
@@ -19,31 +20,55 @@ final public class BogoSortTest
 
 
 	private void run() {
-		System.out.print("Bogo sort testing program\nPlease enter lines to sort and finish with an EOF character:\n");
+		System.out.print("Bogo Sort testing program\n");
+		BogoSort<String> bogoSortTask = null;
 
-
-		/* Read data */
-		Vector<String> vector = new Vector<String>();
-		BufferedReader reader =
-			new BufferedReader(new InputStreamReader(System.in));
-
-		try {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				vector.addElement(line);
+		/* Try to load saved task */
+		if (TaskLoader.savedTaskExists()) {
+			System.out.print("Loading saved task... ");
+			try {
+				bogoSortTask = (BogoSort<String>)TaskLoader.loadTask();
+				System.out.print("done.\nLoaded:\n");
+				for (String line : bogoSortTask) {
+					System.out.print(">> ");
+					System.out.println(line);
+				}
+			}
+			catch (Exception e) {
+				System.out.print("failed: " + e.toString() + "\n");
+				bogoSortTask = null;
 			}
 		}
-		catch (IOException e) {
-			/* ignore */
+
+
+		/* Saved task not loaded, read task from stdin */
+		if (bogoSortTask == null) {
+			System.out.print("Please enter lines to sort and finish with an EOF character:\n");
+
+			/* Read data */
+			Vector<String> vector = new Vector<String>();
+			BufferedReader reader =
+				new BufferedReader(new InputStreamReader(System.in));
+
+			try {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					vector.addElement(line);
+				}
+			}
+			catch (IOException e) {
+				/* ignore */
+			}
+
+			bogoSortTask =
+				new BogoSort<String>(vector.iterator(), vector.size());
 		}
 
 
 		/* Initialise sorting */
 		System.out.print("\nSorting...  ");
-		BogoSort<String> bogoSortTask =
-			new BogoSort<String>(vector.iterator(), vector.size());
 		task = bogoSortTask;
-		onProgress(task, -1, 0);
+		onProgress(task, 0, 0);
 		task.addProgressListener(this);
 		task.unpause();
 
@@ -58,21 +83,37 @@ final public class BogoSortTest
 
 		/* Print output */
 		if (done) {
+			TaskLoader.deleteTask();
 			System.out.print("\bdone.\nSorted:\n");
-			for (String line : bogoSortTask) System.out.println(line);
+			for (String line : bogoSortTask) {
+				System.out.print(">> ");
+				System.out.println(line);
+			}
 		} else {
-			System.out.print("\nInterrupted.\n");
+			System.out.print("\nInterrupted.\nSaving task... ");
+			try {
+				TaskLoader.saveTask(task);
+				System.out.print("done.\n");
+			}
+			catch (Exception e) {
+				System.out.print("failed: " + e.toString() + "\n");
+			}
 		}
 	}
 
 
 
 	private static char animation[] = { '.', 'o', 'O', '0', 'O', 'o' };
-	int animationPos = -1;
-	long lastTick = 0;
+	private int animationPos = -1;
+	private long lastTick = 0, lastSave = 0;
 
 	public void onProgress(Task task, long iterations, long end) {
 		long tick = (new Date()).getTime();
+		if (tick - lastSave >= 5000) {
+			try { TaskLoader.saveTask(task); }
+			catch (Exception e) { /* ignore */ }
+			lastSave = tick;
+		}
 		if (tick - lastTick >= 250) {
 			lastTick = tick;
 			System.out.print('\b');
@@ -83,7 +124,7 @@ final public class BogoSortTest
 
 
 
-	Task task;
+	private Task task;
 
 	public void handleSignal() {
 		task.pause();

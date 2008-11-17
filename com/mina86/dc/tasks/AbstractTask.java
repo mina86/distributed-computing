@@ -3,17 +3,26 @@ package com.mina86.dc.tasks;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.LinkedList;
+import java.io.ObjectInputStream;
+import java.io.IOException;
 import com.mina86.dc.common.Task;
 
 
 public abstract class AbstractTask implements Task {
-	static final long serialVersionUID = 0xb8b8c87befd452e2L;
+	static final long serialVersionUID = 0x8425c482d9a48588L;
 
 	transient private boolean running = true;
-	protected long iterations = 0, end;
+	protected long iterations, end = 0;
 
 	protected AbstractTask(long theEnd) {
-		this.end = theEnd;
+		end = theEnd;
+	}
+
+	private void readObject(ObjectInputStream in)
+		throws IOException, ClassNotFoundException {
+		in.defaultReadObject();
+		running = true;
+		listeners = new LinkedList<ProgressListener>();
 	}
 
 
@@ -40,6 +49,7 @@ public abstract class AbstractTask implements Task {
 
 	transient private List<ProgressListener> listeners =
 		new LinkedList<ProgressListener>();
+
 
 	final public void addProgressListener(ProgressListener listener) {
 		ListIterator<ProgressListener> it = listeners.listIterator(0);
