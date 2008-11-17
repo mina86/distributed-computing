@@ -106,7 +106,7 @@ public class GetOptions {
 		 * Constructs the exception.
 		 * \param optName    option name that caused problem.
 		 * \param theValue   the value given as an argument for an option.
-		 * \param theMessage error message.
+		 * \param message    error message.
 		 */
 		public InvalidValue(String optName, String theValue, String message) {
 			super(optName, message);
@@ -298,7 +298,7 @@ public class GetOptions {
 		/**
 		 * Constructs object.
 		 * \param theHandler      handler handling the option.
-		 * \param theTakesOption  whether option takes argument.
+		 * \param theTakesArg     whether option takes argument.
 		 * \param theDefault      default argument.
 		 */
 		public Option(Handler theHandler, TakesArg theTakesArg,
@@ -311,7 +311,7 @@ public class GetOptions {
 		/**
 		 * Constructs object.
 		 * \param theHandler      handler handling the option.
-		 * \param theTakesOption  whether option takes argument.
+		 * \param theTakesArg     whether option takes argument.
 		 */
 		public Option(Handler theHandler, TakesArg theTakesArg) {
 			handler = theHandler;

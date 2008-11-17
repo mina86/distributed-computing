@@ -27,5 +27,8 @@ run-client::
 	exec $(JAVA) $(JAVAFLAGS) $(RMIFLAGS) com.mina86.DC client
 
 
+doc::
+	exec doxygen
+
 clean::
 	exec rm -f -- $(CLASS)
