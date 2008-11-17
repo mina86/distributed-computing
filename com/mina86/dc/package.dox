@@ -1,0 +1,8 @@
+/** \package com.mina86.dc
+
+Code of the distributed computing infrastructure, that is a server and
+a client as well as \link com.mina86.dc.common common
+interfaces\endlink, implmentations of various tasks and a simple \link
+com.mina86.dc.tests test programs \endlink.
+
+*/

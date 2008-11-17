@@ -96,7 +96,8 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 INPUT                  = ./com
 INPUT_ENCODING         = UTF-8
-FILE_PATTERNS          = *.java
+FILE_PATTERNS          = *.java \
+                         *.dox
 RECURSIVE              = YES
 EXCLUDE                = 
 EXCLUDE_SYMLINKS       = NO

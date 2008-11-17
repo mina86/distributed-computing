@@ -1,0 +1,5 @@
+/**
+ * \package com.mina86.dc.server
+ *
+ * Implementation of distributed computing server program.
+ */

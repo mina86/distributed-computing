@@ -1,0 +1,5 @@
+/**
+ * \package com.mina86.dc.common
+ *
+ * Interfaces shared between distributed computing server and client programs.
+ */
