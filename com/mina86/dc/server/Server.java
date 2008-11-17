@@ -62,15 +62,15 @@ public final class Server
 				new GetOptions.IntegerHandler(Registry.REGISTRY_PORT,
 				                              1024, 0xffff);
 			GetOptions getopts = new GetOptions();
-			getopts.addOption("-", vec, GetOptions.TakesOption.REQ);
-			getopts.addOption("p", portArg, GetOptions.TakesOption.REQ);
+			getopts.addOption("-", vec, GetOptions.TakesArg.REQ);
+			getopts.addOption("p", portArg, GetOptions.TakesArg.REQ);
 			getopts.addAlias("port", "p");
 			getopts.parseArguments(args, 1);
 			serviceName = vec.get(0, DC.defaultServiceName);
 			port = portArg.value;
 		}
 		catch (GetOptions.Exception e) {
-			System.err.println(e.getArgumentName() + ": " + e.getMessage());
+			System.err.println(e.getFullMessage());
 			System.exit(1);
 		}
 

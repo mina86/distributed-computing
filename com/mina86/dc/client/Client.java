@@ -24,14 +24,14 @@ public final class Client
 		try {
 			GetOptions.VectorHandler vec = new GetOptions.VectorHandler(1);
 			GetOptions getopts = new GetOptions();
-			getopts.addOption("-", vec, GetOptions.TakesOption.REQ);
+			getopts.addOption("-", vec, GetOptions.TakesArg.REQ);
 			getopts.parseArguments(args, 1);
 
 			serviceName = vec.get(0, DC.defaultServiceName);
 			rmiURL = vec.get(1, DC.defaultRegistryURL);
 		}
 		catch (GetOptions.Exception e) {
-			System.err.println(e.getArgumentName() + ": " + e.getMessage());
+			System.err.println(e.getFullMessage());
 			System.exit(1);
 		}
 
