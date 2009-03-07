@@ -1,0 +1,55 @@
+You can build the project using GNU make by simply invoking
+a&nbsp;`make` command.  This should compile or java files into class
+files.  If you don't have GNU make all you need to do is compile each
+individual java files in some other way.
+
+
+Before running you need to preare a&nbsp;proper policy file, for
+instance:
+
+    grant codeBase "file:/home/mina86/code/opa/" {
+        permission java.security.AllPermission;
+    };
+
+with path set to location where com directory with class files exists.
+
+
+To run the programs you can (once again) use GNU make:
+
+    make run-registry   will run RMI registry
+    make run-server     will run DC server
+    make run-client     will run DC client
+
+Each of this command should be run in separate terminal window as they
+don't go into background.
+
+If you are missing GNU make use the following instead of the three
+above:
+
+    rmiregistry
+    java -cp . -Djava.security.policy=policy \
+               -Djava.rmi.server.codebase=file://$PWD \
+               -Djava.rmi.server.hostname=127.0.0.1 \
+               com.mina86.DC server
+    java -cp . -Djava.security.policy=policy \
+               -Djava.rmi.server.codebase=file://$PWD \
+               -Djava.rmi.server.hostname=127.0.0.1 \
+               com.mina86.DC client
+
+
+For easier handling you can use a&nbsp;Java archive with all class
+files.  To do that execute:
+
+    jar cfm dc.jar Manifest.txt $(find com -name '*.class')
+
+After JAR file is created you can prepare another policy file with
+path pointing to the archive and start each program as:
+
+    rmiregistry
+    java -Djava.security.policy=policy -jar dc.jar server
+    java -Djava.security.policy=policy -jar dc.jar client
+
+
+For usage on strange operating systems consult it's documentation.
+Also for running the application via the network consult to Java
+documentation.
