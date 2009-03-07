@@ -36,6 +36,13 @@ public interface Task extends Serializable {
 	public boolean run();
 
 
+	/** Returns task's size. */
+	public int size();
+
+	/** Returns how long the task has been calculated in miliseconds. */
+	public long time();
+
+
 	/** Listener of task's progress. */
 	public interface ProgressListener {
 		/**

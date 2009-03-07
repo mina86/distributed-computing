@@ -250,14 +250,6 @@ public class GetOptions {
 		/**
 		 * Constructors handler.
 		 * \param theValue initial value.
-		 * \param theMax   maximal possible value.
-		 */
-		public IntegerHandler(int theValue, int theMax) {
-			this(theValue, Integer.MIN_VALUE, theMax);
-		}
-		/**
-		 * Constructors handler.
-		 * \param theValue initial value.
 		 * \param theMin   minimal possible value.
 		 * \param theMax   maximal possible value.
 		 */

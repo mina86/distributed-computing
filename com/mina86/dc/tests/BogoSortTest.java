@@ -117,7 +117,7 @@ final public class BogoSortTest
 	/** Last time animation character was changed. */
 	private long lastTick = 0;
 	/** Last time task was saved. */
-	private lastSave = 0;
+	private long lastSave = 0;
 
 	/**
 	 * Called each time task finishes single cycle.  This method saves
@@ -128,7 +128,7 @@ final public class BogoSortTest
 	 * \param end        how many iterations are needed (ignored).
 	 */
 	public void onProgress(Task task, long iterations, long end) {
-		long tick = (new Date()).getTime();
+		long tick = System.currentTimeMillis();
 		if (tick - lastSave >= 5000) {
 			try { TaskLoader.saveTask(task); }
 			catch (Exception e) { /* ignore */ }

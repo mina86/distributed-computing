@@ -4,23 +4,46 @@ import java.util.Iterator;
 import java.io.PrintStream;
 
 
+/**
+ * An implementation of nondeterministic BogoSort algorithm.
+ *
+ * BogoSort is a sorting algorithm that works in the following way:
+ * (1) if the sequence is sorted then algorithm ends; (2) otherwise
+ * generate next permutation of the sequence and go to step (1).
+ * A nondeterministic version generates a random permutation.
+ *
+ * BogoSort algorithm has complexity of <code>O(n!)</code> which is
+ * insane as far as sorting algorithm are concerned but it is perfect
+ * for demonstrating distributed computing infrastructure.
+ */
 final public class BogoSort<T extends Comparable>
 	extends AbstractVerifiableTask
 	implements Iterable<T> {
-	static final long serialVersionUID = 0xcacb0e95c8449adfL;
+	/** Version UID used for serialization. */
+	static final long serialVersionUID = 0xbb94ec5699152e46L;
 
+	/** Elements to sort. */
 	private T data[];
 
+	/**
+	 * Initializes task.
+	 * \param theData elements to sort.
+	 */
 	public BogoSort(T theData[]) {
-		super(0);
+		super(0, theData.length);
 		data = (T[])new Comparable[theData.length]; /* Java sux */
 		for (int i = 0; i < data.length; ++i) {
 			data[i] = theData[i];
 		}
 	}
 
+	/**
+	 * Initializes task.
+	 * \param it    elements to sort.
+	 * \param count number of elements to sort.
+	 */
 	public BogoSort(Iterator<T> it, int count) {
-		super(0);
+		super(0, count);
 		data = (T[])new Comparable[count]; /* Java sux */
 		for (int i = 0; it.hasNext(); ++i) {
 			data[i] = it.next();

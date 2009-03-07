@@ -1,0 +1,44 @@
+/** \mainpage Distributed Computing
+
+Projekt jest przyk³adem implementacji prostego systemu obliczeñ
+rozproszonych opartego na technologii RMI (Remote Method Invocation).
+W przyk³adzie zastosowano algorytm Bogo Sort.  Jest to metoda
+sortowania o z³o¿ono¶ci \f$n!\f$ (sprawdzane s± wszystkie permutacje
+ci±gu, a¿ znajdzie siê w³a¶ciw±) co doskonale nadaje siê do
+zaprezentowania schematu dzia³ania sieci.
+
+W systemie znajduje siê jeden serwer, który udostêpnia (za
+po¶rednictwem interfejsu \link com.mina86.dc.common.ServerInterface
+ServerInterface\endlink) metody \link
+com.mina86.dc.common.ServerInterface.getTask() getTask()\endlink oraz
+\link com.mina86.dc.common.ServerInterface.sendResult()
+sendResult()\endlink.  Pierwsza zwraca klientowi obiektu
+implementuj±cy interfejs \link com.mina86.dc.common.Task Task\endlink
+definiuj±cy zadanie do wykonania, a druga przyjmuje taki obiekt z ju¿
+wyliczonym wynikiem.
+
+Klienci ³±cz± siê z serwerem i pobieraj± od niego zadanie, które
+nastêpnie wykonuj±.  Zadanie jest co pewien czas serializowane na
+dysku (z zachowaniem bezpiecznego sposobu zapisywania -- najpierw do
+innego pliku, a potem zmiana nazwy pliku) dziêki czemu program mo¿na
+w dowolnej chwili wy³±czyæ i przy nastêpnym uruchomieniu aplikacja
+zacznie od momentu, w którym poprzednio przerwa³a.
+
+Aby to dzia³a³o, musi istnieæ mo¿liwo¶æ przerwania metody \link
+com.mina86.dc.common.Task.run() run()\endlink szukaj±cej odpowiedzi na
+dany problem.  Zrealizowane jest to w ten sposób, i¿ obliczenia
+podzielone s± na iteracje i przed rozpoczêciem ka¿dej iteracji
+sprawdzane jest, czy nie zosta³a wywo³ana metoda \link
+com.mina86.dc.common.Task.pause() pause()\endlink.  Dodatkowo,
+o fakcie zakoñczenia ka¿dej iteracji informowani s± wszyscy
+<i>listenerzy</i> co pozwala wy¶wietlaæ informacje o postêpie, a tak¿e
+periodyczne zapisywanie zadania (na wypadek nag³ego unicestwienia
+aplikacji).
+
+Klienci s± rzecz jasna odporni na awariê serwera, czy od³±czenie od
+Internetu -- je¿eli zadania nie da siê pobraæ lub odes³aæ klient
+ponawia próby z pewnym (rosn±cym do pewnego momentu) opó¼nieniem.
+Przy okazji, warto wspomnieæ, i¿ klient nie musi kontaktowaæ siê
+z serwerem, je¿eli posiada zadanie zapisane na dysku.
+
+*/

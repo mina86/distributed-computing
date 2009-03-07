@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.text.NumberFormat;
 import com.mina86.DC;
 import com.mina86.dc.common.ServerInterface;
 import com.mina86.dc.common.Task;
@@ -15,25 +16,42 @@ import com.mina86.util.SignalHandlers;
 
 /** A distributed computing server. */
 public final class Server implements ServerInterface, DC.Application {
+	/* A default task size if client requested size 0. */
+	private int defaultSize = 8;
 
-	static String data[] = {
-		"foo", "bar", "baz", "qux", "quux", "fred", "barney",
-		"42", "9", "10"
-	};
+	public Task getTask(int n)
+		throws RemoteException, NegativeArraySizeException {
+		if (n < 0) {
+			System.out.println("Negative task size requested.");
+			throw new NegativeArraySizeException("negative task size requested (" + n + ")");
+		}
 
-	public Task getTask() throws RemoteException {
-		System.out.println("Sending task.");
-		return new BogoSort<String>(data);
+		if (n == 0) {
+			n = defaultSize;
+		} else if (n == 1) {
+			n = 2;
+		}
+
+		System.out.println("Generating and sending task (n = " + n + ").");
+
+		Long data[] = new Long[n];
+		for (int i = 0; i < n; ++i) {
+			data[i] = new Long((long)(Math.random()*1000000000));
+		}
+
+		return new BogoSort<Long>(data);
 	}
 
 	public void sendResult(Task t) throws RemoteException {
-		System.out.print("Got result: { ");
-		BogoSort<String> task = (BogoSort<String>)t;
-		for (String item : task) {
-			System.out.print(item);
-			System.out.print(" ");
+		System.out.print("Got result: {");
+		BogoSort<Long> task = (BogoSort<Long>)t;
+		NumberFormat nf = NumberFormat.getIntegerInstance();
+		String sep = " ";
+		for (Long item : task) {
+			System.out.print(sep); sep = ", ";
+			System.out.print(nf.format(item));
 		}
-		System.out.println("}");
+		System.out.println(" }");
 	}
 
 
@@ -76,13 +94,17 @@ public final class Server implements ServerInterface, DC.Application {
 			GetOptions.IntegerHandler portArg =
 				new GetOptions.IntegerHandler(Registry.REGISTRY_PORT,
 				                              1024, 0xffff);
+			GetOptions.IntegerHandler sizeArg =
+				new GetOptions.IntegerHandler(8, 2, 1024);
 			GetOptions getopts = new GetOptions();
 			getopts.addOption("-", vec, GetOptions.TakesArg.REQ);
 			getopts.addOption("p", portArg, GetOptions.TakesArg.REQ);
+			getopts.addOption("n", sizeArg, GetOptions.TakesArg.REQ);
 			getopts.addAlias("port", "p");
 			getopts.parseArguments(args, 1);
 			serviceName = vec.get(0, DC.defaultServiceName);
 			port = portArg.value;
+			defaultSize = sizeArg.value;
 		}
 		catch (GetOptions.Exception e) {
 			System.err.println(e.getFullMessage());

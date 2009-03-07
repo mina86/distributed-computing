@@ -5,7 +5,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.Date;
+import java.text.DecimalFormat;
 import com.mina86.DC;
 import com.mina86.dc.client.TaskLoader;
 import com.mina86.dc.common.ServerInterface;
@@ -29,11 +29,19 @@ public final class Client implements Task.ProgressListener, DC.Application {
 		try {
 			GetOptions.VectorHandler vec = new GetOptions.VectorHandler(1);
 			GetOptions getopts = new GetOptions();
+			GetOptions.IntegerHandler timeArg =
+				new GetOptions.IntegerHandler(0, 1, Integer.MAX_VALUE);
 			getopts.addOption("-", vec, GetOptions.TakesArg.REQ);
+			getopts.addOption("t", timeArg, GetOptions.TakesArg.REQ);
 			getopts.parseArguments(args, 1);
 
 			serviceName = vec.get(0, DC.defaultServiceName);
 			rmiURL = vec.get(1, DC.defaultRegistryURL);
+			constTime = timeArg.value * 1000;
+			if (constTime != 0) {
+				System.out.println("Aiming at constant time " +
+				                   formatTime(constTime) + ".");
+			}
 		}
 		catch (GetOptions.Exception e) {
 			System.err.println(e.getFullMessage());
@@ -77,6 +85,11 @@ public final class Client implements Task.ProgressListener, DC.Application {
 	/** Task being calculated. */
 	private Task task = null;
 
+	/** If we are aiming at constant time then what time period otherwise 0. */
+	private long constTime = 0;
+	/** Task's size to request. */
+	private int taskSizeToRequest = 0;
+
 
 	/** Tries to look up the server. */
 	private void getServer() throws RemoteException, NotBoundException {
@@ -104,7 +117,7 @@ public final class Client implements Task.ProgressListener, DC.Application {
 			System.out.print("Loading saved task... ");
 			try {
 				task = TaskLoader.loadTask();
-				System.out.print("done.\n");
+				System.out.print("done (n = " + task.size() + ").\n");
 				return true;
 			}
 			catch (Exception e) {
@@ -117,12 +130,12 @@ public final class Client implements Task.ProgressListener, DC.Application {
 			getServer();
 
 			System.out.print("Downloading task... ");
-			while ((task = server.getTask()) == null) {
+			while ((task = server.getTask(taskSizeToRequest)) == null) {
 				System.out.println("no task.");
 				Thread.sleep(15);
 				System.out.print("Downloading task... ");
 			}
-			System.out.print("done.\n");
+			System.out.print("done (n = " + task.size() + ").\n");
 
 			return true;
 		}
@@ -134,6 +147,31 @@ public final class Client implements Task.ProgressListener, DC.Application {
 	}
 
 
+	/**
+	 * Returns a nicely formatted time.
+	 * \param time the time in miliseconds.
+	 */
+	private String formatTime(long time) {
+		if (time < 60000) {
+			return (new DecimalFormat("0.000")).format(time / 1000.0) + " s";
+		}
+
+		String days = "";
+		if (time > 24 * 60 * 60000) {
+			days = time / (24 * 60 * 6000) + " d ";
+		}
+
+		int   s = (int)  (time % 60000); time /= 60000;
+		short m = (short)(time %    60); time /=    60;
+
+		return days +
+			(new DecimalFormat("##")).format(time % 24) + ":" +
+			(new DecimalFormat("00")).format(m) + ":" +
+			(new DecimalFormat("00.000")).format(s / 1000.0);
+		/* Now compare it to sprintf(buffer, "%2d:%02d:%02d:%03d",
+		 * ...) which one would use in C. */
+	}
+
 	/** Starts calculating task. */
 	private boolean runTask() {
 		System.out.print("Calculating...  ");
@@ -142,10 +180,24 @@ public final class Client implements Task.ProgressListener, DC.Application {
 		task.addProgressListener(this);
 		task.unpause();
 
-		boolean done = running && task.run();
+		if (!running || !task.run()) {
+			System.out.println("\nInterrupted.");
+			return false;
+		}
 
-		System.out.println(done ? "\bdone." : "\nInterrupted.");
-		return done;
+		long time = task.time();
+		System.out.println("\bdone in " + formatTime(time) + ".");
+
+		if (constTime != 0) {
+			taskSizeToRequest = task.size();
+			if (time < constTime / 2) {
+				taskSizeToRequest += 1;
+			} else if (time > 3 * constTime / 2) {
+				taskSizeToRequest -= 1;
+			}
+		}
+
+		return true;
 	}
 
 
@@ -199,7 +251,7 @@ public final class Client implements Task.ProgressListener, DC.Application {
 	/** Last time animation character was changed. */
 	private long lastTick = 0;
 	/** Last time task was saved. */
-	private lastSave = 0;
+	private long lastSave = 0;
 
 
 	/**
@@ -211,11 +263,10 @@ public final class Client implements Task.ProgressListener, DC.Application {
 	 * \param end        how many iterations are needed (ignored).
 	 */
 	public void onProgress(Task task, long iterations, long end) {
-		long tick = (new Date()).getTime();
+		long tick = System.currentTimeMillis();
 		if (tick - lastSave >= 5000) {
 			try { TaskLoader.saveTask(task); }
 			catch (Exception e) { /* ignore */ }
-			lastSave = tick;
 		}
 		if (tick - lastTick >= 250) {
 			lastTick = tick;
