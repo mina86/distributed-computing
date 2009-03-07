@@ -18,13 +18,13 @@ all: $(CLASS)
 
 
 run-registry::
-	exec $(RMIREGISTRY)
+	exec $(RMIREGISTRY) $(ARGS)
 
 run-server::
-	exec $(JAVA) $(JAVAFLAGS) $(RMIFLAGS) com.mina86.DC server
+	exec $(JAVA) $(JAVAFLAGS) $(RMIFLAGS) com.mina86.DC server $(ARGS)
 
 run-client::
-	exec $(JAVA) $(JAVAFLAGS) $(RMIFLAGS) com.mina86.DC client
+	exec $(JAVA) $(JAVAFLAGS) $(RMIFLAGS) com.mina86.DC client $(ARGS)
 
 
 doc::
