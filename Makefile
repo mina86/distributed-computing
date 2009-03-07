@@ -5,8 +5,9 @@ JAVACFLAGS	+= -cp .
 JAVA		?= java
 JAVAFLAGS	+= -cp .
 RMIFLAGS	:= -Djava.security.policy=policy
-RMIFLAGS	+= -Djava.rmi.server.codebase=file:///home/mina86/code/opa/
-RMIFLAGS	+= -Djava.rmi.server.hostname=localhost
+#RMIFLAGS	+= -Djava.rmi.server.codebase=file:///home/mina86/code/opa/
+RMIFLAGS	+= -Djava.rmi.server.codebase=file://$(PWD)
+RMIFLAGS	+= -Djava.rmi.server.hostname=127.0.0.1
 RMIREGISTRY	?= rmiregistry
 SRC		:= $(shell find com -name \*.java)
 CLASS		:= $(addsuffix .class,$(basename $(SRC)))
